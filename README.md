@@ -2,99 +2,55 @@
 
 # 
 
-# A RuneLite plugin that locally replaces certain equipment appearances worn by other players.
+# A RuneLite plugin that makes other players' expensive gear look a little less impressive.
 
 # 
 
-# Inspired by Fashionscape, this plugin lets you see alternative equipment appearances without changing anyone's actual gear.
+# Tired of seeing Infernal capes, Sanguine Torva, and other prestigious gear everywhere? HumbleScape replaces them with more humble alternatives.
 
 # 
 
-# \## Features
+# \## Supported Equipment
 
 # 
 
-# Currently supported replacements:
-
-# 
-
-# | Original equipment | Displayed equipment |
+# | Original Equipment | Replacement |
 
 # |---|---|
 
 # | Infernal cape | Fire cape |
 
-# | Dizana's quiver (supported variants) | Ava's assembler |
+# | Dizana's quiver | Ava's assembler |
 
-# | TzKal slayer helmet (Zuk helm) | Slayer helmet |
+# | TzKal slayer helmet | Slayer helmet |
 
-# | Radiant oathplate helm, chest and legs | Regular oathplate equivalents |
+# | Radiant oathplate | Regular oathplate |
 
-# | Sanguine Torva helm, platebody and platelegs | Regular Torva equivalents |
+# | Sanguine Torva | Regular Torva |
 
-# | Osmumten's fang (or) | Osmumten's fang |
+# | Osmumten's fang (or) | Regular fang |
 
-# 
-
-# \## How it works
+# | Ghommal's Avernic defender (tiers 5–6) | Dragon defender |
 
 # 
 
-# The plugin modifies other players' equipment appearances locally through RuneLite's player composition system.
+# Supported variants are included where applicable.
 
 # 
 
-# \- Only affects what you see.
-
-# \- Does not modify actual equipment, stats, or gameplay.
-
-# \- Does not affect your own character.
-
-# \- Does not transmit equipment changes to other players.
+# \## How It Works
 
 # 
 
-# \## Development
+# HumbleScape changes how other players' equipment appears on your screen.
 
 # 
 
-# Requires a compatible Java JDK and Gradle.
+# \- Only affects other players, not your own character.
 
-# 
+# \- Changes are purely visual and local to your RuneLite client.
 
-# Build:
-
-# 
-
-# ```bash
-
-# ./gradlew build
-
-# ```
-
-# 
-
-# Launch a development RuneLite client:
-
-# 
-
-# ```bash
-
-# ./gradlew run
-
-# ```
-
-# 
-
-# \## Limitations
-
-# 
-
-# \- Not all cosmetic equipment variants are supported.
-
-# \- Some equipment and appearance changes may require further compatibility testing.
-
-# \- Appearance restoration is best-effort while the plugin is under development.
+# \- Does not affect equipment stats or gameplay.
 
 # 
 
@@ -102,7 +58,5 @@
 
 # 
 
-# See \[LICENSE](LICENSE).
-
-# 
+# BSD 2-Clause License. See \[LICENSE](LICENSE).
 

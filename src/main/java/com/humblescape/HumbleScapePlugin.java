@@ -1,51 +1,41 @@
 
 package com.humblescape;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.IdentityHashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
-import java.util.Collections;
 import javax.inject.Inject;
-
 import net.runelite.api.Client;
 import net.runelite.api.GameState;
 import net.runelite.api.ItemID;
 import net.runelite.api.Player;
 import net.runelite.api.PlayerComposition;
-import net.runelite.api.events.GameTick;
 import net.runelite.api.events.GameStateChanged;
-
+import net.runelite.api.events.GameTick;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
 
 @PluginDescriptor(
 		name = "HumbleScape",
-		description = "Removes cosmetic upgrades from other players' equipment"
+		description = "Humble your friends by changing their gear"
 )
 public class HumbleScapePlugin extends Plugin
 {
-	@Inject
-	private Client client;
-
-	private static final Map<Integer, Integer> REPLACEMENTS =
-			new HashMap<>();
-
-	// Only compositions we have actually modified.
-	private final Map<PlayerComposition, Map<Integer, Integer>>
-			originalEquipment = new IdentityHashMap<>();
+	private static final Map<Integer, Integer> REPLACEMENTS = new HashMap<>();
 
 	static
 	{
-		// Infernal cape -> Fire cape
+		// Infernal cape
 		REPLACEMENTS.put(ItemID.INFERNAL_CAPE, ItemID.FIRE_CAPE);
 		REPLACEMENTS.put(ItemID.INFERNAL_CAPE_21297, ItemID.FIRE_CAPE);
 		REPLACEMENTS.put(ItemID.INFERNAL_CAPE_23622, ItemID.FIRE_CAPE);
 		REPLACEMENTS.put(ItemID.INFERNAL_CAPE_L, ItemID.FIRE_CAPE);
 
-		// Dizana's quiver -> Ava's assembler
+		// Dizana's quiver
 		REPLACEMENTS.put(ItemID.DIZANAS_QUIVER_UNCHARGED, ItemID.AVAS_ASSEMBLER);
 		REPLACEMENTS.put(ItemID.DIZANAS_QUIVER_L_UNCHARGED, ItemID.AVAS_ASSEMBLER);
 		REPLACEMENTS.put(ItemID.DIZANAS_QUIVER, ItemID.AVAS_ASSEMBLER);
@@ -53,8 +43,8 @@ public class HumbleScapePlugin extends Plugin
 		REPLACEMENTS.put(ItemID.BLESSED_DIZANAS_QUIVER, ItemID.AVAS_ASSEMBLER);
 		REPLACEMENTS.put(ItemID.BLESSED_DIZANAS_QUIVER_L, ItemID.AVAS_ASSEMBLER);
 
-		// Zuk helm -> Slayer helmet
-		REPLACEMENTS.put(ItemID.TZKAL_SLAYER_HELMET, ItemID.SLAYER_HELMET);
+		// Slayer helmets
+		REPLACEMENTS.put(ItemID.TZTOK_SLAYER_HELMET, ItemID.SLAYER_HELMET);
 		REPLACEMENTS.put(ItemID.TZTOK_SLAYER_HELMET_I, ItemID.SLAYER_HELMET);
 		REPLACEMENTS.put(ItemID.TZTOK_SLAYER_HELMET_I_25902, ItemID.SLAYER_HELMET);
 		REPLACEMENTS.put(ItemID.VAMPYRIC_SLAYER_HELMET, ItemID.SLAYER_HELMET);
@@ -64,25 +54,31 @@ public class HumbleScapePlugin extends Plugin
 		REPLACEMENTS.put(ItemID.TZKAL_SLAYER_HELMET_I, ItemID.SLAYER_HELMET);
 		REPLACEMENTS.put(ItemID.TZKAL_SLAYER_HELMET_I_25914, ItemID.SLAYER_HELMET);
 
-		// Radiant oathplate -> Regular oathplate
+		// Radiant oathplate
 		REPLACEMENTS.put(ItemID.RADIANT_OATHPLATE_HELM, ItemID.OATHPLATE_HELM);
 		REPLACEMENTS.put(ItemID.RADIANT_OATHPLATE_CHEST, ItemID.OATHPLATE_CHEST);
-		REPLACEMENTS.put(ItemID.RADIANT_OATHPLATE_LEGS, ItemID.OATHPLATE_LEGS );
+		REPLACEMENTS.put(ItemID.RADIANT_OATHPLATE_LEGS, ItemID.OATHPLATE_LEGS);
 
-		// Sanguine Torva -> Regular Torva
+		// Sanguine Torva
 		REPLACEMENTS.put(ItemID.SANGUINE_TORVA_FULL_HELM, ItemID.TORVA_FULL_HELM);
 		REPLACEMENTS.put(ItemID.SANGUINE_TORVA_PLATEBODY, ItemID.TORVA_PLATEBODY);
 		REPLACEMENTS.put(ItemID.SANGUINE_TORVA_PLATELEGS, ItemID.TORVA_PLATELEGS);
 
-		// Fang (or) -> Regular fang
+		// Fang ornament kit
 		REPLACEMENTS.put(ItemID.OSMUMTENS_FANG_OR, ItemID.OSMUMTENS_FANG);
 
-		// Radiant oathplate -> Regular oathplate
+		// Ghommal's Avernic defender
 		REPLACEMENTS.put(ItemID.GHOMMALS_AVERNIC_DEFENDER_5, ItemID.DRAGON_DEFENDER);
 		REPLACEMENTS.put(ItemID.GHOMMALS_AVERNIC_DEFENDER_5_L, ItemID.DRAGON_DEFENDER);
 		REPLACEMENTS.put(ItemID.GHOMMALS_AVERNIC_DEFENDER_6, ItemID.DRAGON_DEFENDER);
 		REPLACEMENTS.put(ItemID.GHOMMALS_AVERNIC_DEFENDER_6_L, ItemID.DRAGON_DEFENDER);
 	}
+
+	@Inject
+	private Client client;
+
+	private final Map<PlayerComposition, Map<Integer, Integer>> originalEquipment =
+			new IdentityHashMap<>();
 
 	@Subscribe
 	public void onGameTick(GameTick event)
@@ -92,9 +88,7 @@ public class HumbleScapePlugin extends Plugin
 			return;
 		}
 
-		// Identity-based set of currently loaded compositions.
-		Set<PlayerComposition> active =
-				Collections.newSetFromMap(new IdentityHashMap<>());
+		Set<PlayerComposition> active = Collections.newSetFromMap(new IdentityHashMap<>());
 
 		for (Player player : client.getPlayers())
 		{
@@ -103,9 +97,7 @@ public class HumbleScapePlugin extends Plugin
 				continue;
 			}
 
-			PlayerComposition composition =
-					player.getPlayerComposition();
-
+			PlayerComposition composition = player.getPlayerComposition();
 			if (composition == null)
 			{
 				continue;
@@ -115,11 +107,7 @@ public class HumbleScapePlugin extends Plugin
 			applyTransmogs(composition);
 		}
 
-		// Forget compositions that are no longer loaded.
-		// They are no longer being rendered by this client.
-		Iterator<PlayerComposition> iterator =
-				originalEquipment.keySet().iterator();
-
+		Iterator<PlayerComposition> iterator = originalEquipment.keySet().iterator();
 		while (iterator.hasNext())
 		{
 			if (!active.contains(iterator.next()))
@@ -132,39 +120,23 @@ public class HumbleScapePlugin extends Plugin
 	private void applyTransmogs(PlayerComposition composition)
 	{
 		int[] equipment = composition.getEquipmentIds();
-
 		if (equipment == null)
 		{
 			return;
 		}
 
-		Map<Integer, Integer> saved =
-				originalEquipment.get(composition);
-
+		Map<Integer, Integer> saved = originalEquipment.get(composition);
 		boolean changed = false;
 
 		for (int slot = 0; slot < equipment.length; slot++)
 		{
 			int equippedId = equipment[slot];
 
-			// If we previously modified this slot, check whether
-			// the game has updated it since our modification.
 			if (saved != null && saved.containsKey(slot))
 			{
-				int originalId = saved.get(slot);
-				int originalItem =
-						originalId - PlayerComposition.ITEM_OFFSET;
-
-				Integer replacement =
-						REPLACEMENTS.get(originalItem);
-
-				int expectedId = replacement == null
-						? -1
-						: replacement + PlayerComposition.ITEM_OFFSET;
-
+				int expectedId = replacementEquipmentId(saved.get(slot));
 				if (equippedId != expectedId)
 				{
-					// Server changed this equipment slot.
 					saved.remove(slot);
 				}
 			}
@@ -174,12 +146,8 @@ public class HumbleScapePlugin extends Plugin
 				continue;
 			}
 
-			int itemId =
-					equippedId - PlayerComposition.ITEM_OFFSET;
-
-			Integer replacement = REPLACEMENTS.get(itemId);
-
-			if (replacement == null)
+			int replacementId = replacementEquipmentId(equippedId);
+			if (replacementId == -1)
 			{
 				continue;
 			}
@@ -191,10 +159,7 @@ public class HumbleScapePlugin extends Plugin
 			}
 
 			saved.put(slot, equippedId);
-
-			equipment[slot] =
-					replacement + PlayerComposition.ITEM_OFFSET;
-
+			equipment[slot] = replacementId;
 			changed = true;
 		}
 
@@ -207,6 +172,18 @@ public class HumbleScapePlugin extends Plugin
 		{
 			composition.setHash();
 		}
+	}
+
+	private static int replacementEquipmentId(int equipmentId)
+	{
+		if (equipmentId < PlayerComposition.ITEM_OFFSET)
+		{
+			return -1;
+		}
+
+		int itemId = equipmentId - PlayerComposition.ITEM_OFFSET;
+		Integer replacement = REPLACEMENTS.get(itemId);
+		return replacement == null ? -1 : replacement + PlayerComposition.ITEM_OFFSET;
 	}
 
 	@Subscribe
@@ -222,8 +199,7 @@ public class HumbleScapePlugin extends Plugin
 	@Override
 	protected void shutDown()
 	{
-		for (Map.Entry<PlayerComposition, Map<Integer, Integer>> entry :
-				originalEquipment.entrySet())
+		for (Map.Entry<PlayerComposition, Map<Integer, Integer>> entry : originalEquipment.entrySet())
 		{
 			PlayerComposition composition = entry.getKey();
 			int[] equipment = composition.getEquipmentIds();
@@ -235,8 +211,7 @@ public class HumbleScapePlugin extends Plugin
 
 			boolean changed = false;
 
-			for (Map.Entry<Integer, Integer> slotEntry :
-					entry.getValue().entrySet())
+			for (Map.Entry<Integer, Integer> slotEntry : entry.getValue().entrySet())
 			{
 				int slot = slotEntry.getKey();
 				int originalId = slotEntry.getValue();
@@ -246,20 +221,7 @@ public class HumbleScapePlugin extends Plugin
 					continue;
 				}
 
-				Integer replacement = REPLACEMENTS.get(
-						originalId - PlayerComposition.ITEM_OFFSET
-				);
-
-				if (replacement == null)
-				{
-					continue;
-				}
-
-				int expectedId =
-						replacement + PlayerComposition.ITEM_OFFSET;
-
-				// Don't overwrite equipment that has changed.
-				if (equipment[slot] == expectedId)
+				if (equipment[slot] == replacementEquipmentId(originalId))
 				{
 					equipment[slot] = originalId;
 					changed = true;
